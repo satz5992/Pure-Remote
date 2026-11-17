@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Pure Remote</string>
+    <string name="tagline">Ad-free remote for Android TV &amp; Google TV</string>
+    <string name="searching">Searching your Wi-Fi for TVs…</string>
+    <string name="search_failed">Wi-Fi search unavailable – add your TV by IP</string>
+    <string name="not_found_yet">Still looking… Is the TV on and on the same Wi-Fi?</string>
+    <string name="found_n">Found %d TV(s) on this Wi-Fi</string>
+    <string name="empty">No TVs yet.\n\nTurn on your Android / Google TV and connect it to the same Wi-Fi as this phone.</string>
+    <string name="add_ip">Add TV by IP address</string>
+    <string name="footer">No ads · No tracking · No internet needed</string>
+</resources>

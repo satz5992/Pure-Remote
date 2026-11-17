@@ -1,0 +1,40 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build release APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+          cp app/build/outputs/apk/release/app-release.apk PureRemote.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PureRemote-apk
+          path: PureRemote.apk
+
+      - name: Publish release (direct download link)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Pure Remote v1.0.${{ github.run_number }}
+          body: Ad-free remote for Android TV / Google TV. Download PureRemote.apk below and install it on your phone.
+          files: PureRemote.apk
+          make_latest: true
