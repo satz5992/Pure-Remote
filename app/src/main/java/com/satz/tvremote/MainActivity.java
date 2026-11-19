@@ -58,12 +58,20 @@ public class MainActivity extends Activity {
         list.setOnItemClickListener((p, v, pos, id) -> open(items.get(pos)));
         list.setOnItemLongClickListener((p, v, pos, id) -> { options(items.get(pos)); return true; });
         findViewById(R.id.add_ip).setOnClickListener(v -> addByIp());
+        findViewById(R.id.add_ir).setOnClickListener(v -> {
+            if (Ir.available(this)) startActivity(new Intent(this, IrSetupActivity.class));
+            else new AlertDialog.Builder(this).setTitle("No IR blaster")
+                    .setMessage("This phone doesn't have an IR emitter, so it can't act as an infrared remote.\n\nIf your TV is an Android / Google TV, use the Wi-Fi remote instead – it appears in the list automatically.")
+                    .setPositiveButton("OK", null).show();
+        });
         new Thread(() -> { try { Tls.init(getFilesDir()); } catch (Exception ignored) {} }).start();
 
         // Jump straight to the last used TV.
         String last = store.lastHost();
         if (b == null && last != null && !getIntent().getBooleanExtra("pick", false)) {
-            for (TvStore.Tv t : store.paired()) if (t.host.equals(last)) { openRemote(t); break; }
+            if (last.startsWith("ir:")) {
+                for (TvStore.IrRemote r : store.irList()) if (r.id().equals(last)) { openIr(r); break; }
+            } else for (TvStore.Tv t : store.paired()) if (t.host.equals(last)) { openRemote(t); break; }
         }
     }
 
@@ -82,6 +90,13 @@ public class MainActivity extends Activity {
 
     private void refresh() {
         items.clear();
+        for (TvStore.IrRemote r : store.irList()) {
+            TvStore.Tv t = new TvStore.Tv(("Xiaomi".equals(r.brand) ? "Xiaomi / Mi" : r.brand) + " TV", "");
+            t.ir = r;
+            t.paired = true;
+            t.online = true;
+            items.add(t);
+        }
         List<TvStore.Tv> paired = store.paired();
         for (TvStore.Tv p : paired) {
             for (TvStore.Tv f : found) if (f.host.equals(p.host)) p.online = true;
@@ -95,8 +110,14 @@ public class MainActivity extends Activity {
         adapter.notifyDataSetChanged();
     }
 
+    private void openIr(TvStore.IrRemote r) {
+        store.setLast(r.id());
+        startActivity(new Intent(this, IrRemoteActivity.class).putExtra("brand", r.brand).putExtra("index", r.index));
+    }
+
     private void open(TvStore.Tv t) {
-        if (t.paired) openRemote(t);
+        if (t.ir != null) openIr(t.ir);
+        else if (t.paired) openRemote(t);
         else PairingFlow.start(this, t.name, t.host, () -> openRemote(t));
     }
 
@@ -106,6 +127,14 @@ public class MainActivity extends Activity {
     }
 
     private void options(TvStore.Tv t) {
+        if (t.ir != null) {
+            new AlertDialog.Builder(this).setTitle(t.name)
+                    .setItems(new String[]{"Find a different code", "Remove"}, (d, w) -> {
+                        if (w == 0) startActivity(new Intent(this, IrSetupActivity.class));
+                        else { store.removeIr(t.ir.brand, t.ir.index); refresh(); }
+                    }).show();
+            return;
+        }
         if (!t.paired) { open(t); return; }
         new AlertDialog.Builder(this).setTitle(t.name)
                 .setItems(new String[]{"Pair again", "Forget this TV"}, (d, w) -> {
@@ -231,7 +260,8 @@ public class MainActivity extends Activity {
             if (v == null) v = LayoutInflater.from(MainActivity.this).inflate(R.layout.item_tv, parent, false);
             TvStore.Tv t = items.get(i);
             ((TextView) v.findViewById(R.id.name)).setText(t.name);
-            String sub = t.host + "  ·  " + (t.paired ? (t.online ? "Paired · Online" : "Paired") : "Tap to pair");
+            String sub = t.ir != null ? "IR remote · code " + (t.ir.index + 1)
+                    : t.host + "  ·  " + (t.paired ? (t.online ? "Paired · Online" : "Paired") : "Tap to pair");
             ((TextView) v.findViewById(R.id.sub)).setText(sub);
             v.findViewById(R.id.dot).setBackgroundResource(t.online || !t.paired ? R.drawable.dot_on : R.drawable.dot_off);
             return v;

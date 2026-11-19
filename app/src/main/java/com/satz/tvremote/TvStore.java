@@ -14,6 +14,7 @@ public final class TvStore {
     public static final class Tv {
         public String name, host;
         public boolean paired, online;
+        public IrRemote ir;
         public Tv(String name, String host) { this.name = name; this.host = host; }
     }
 
@@ -66,6 +67,45 @@ public final class TvStore {
         for (Tv t : list) if (t.name.equals(name) && !t.host.equals(newHost)) { t.host = newHost; changed = true; }
         if (changed) save(list);
         return changed;
+    }
+
+    // ---- IR remotes: brand + code-set index into IrDb ----
+
+    public static final class IrRemote {
+        public final String brand; public final int index;
+        IrRemote(String b, int i) { brand = b; index = i; }
+        public String id() { return "ir:" + brand + ":" + index; }
+    }
+
+    public List<IrRemote> irList() {
+        List<IrRemote> l = new ArrayList<>();
+        try {
+            JSONArray a = new JSONArray(prefs.getString("ir", "[]"));
+            for (int i = 0; i < a.length(); i++) {
+                JSONObject o = a.getJSONObject(i);
+                l.add(new IrRemote(o.getString("b"), o.getInt("i")));
+            }
+        } catch (Exception ignored) {}
+        return l;
+    }
+
+    private void saveIr(List<IrRemote> l) {
+        JSONArray a = new JSONArray();
+        try { for (IrRemote r : l) a.put(new JSONObject().put("b", r.brand).put("i", r.index)); } catch (Exception ignored) {}
+        prefs.edit().putString("ir", a.toString()).apply();
+    }
+
+    public void addIr(String brand, int index) {
+        List<IrRemote> l = irList();
+        for (int i = l.size() - 1; i >= 0; i--) if (l.get(i).brand.equals(brand)) l.remove(i);
+        l.add(0, new IrRemote(brand, index));
+        saveIr(l);
+    }
+
+    public void removeIr(String brand, int index) {
+        List<IrRemote> l = irList();
+        for (int i = l.size() - 1; i >= 0; i--) if (l.get(i).brand.equals(brand) && l.get(i).index == index) l.remove(i);
+        saveIr(l);
     }
 
     public String lastHost() { return prefs.getString("last", null); }

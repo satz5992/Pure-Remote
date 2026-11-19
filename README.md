@@ -1,5 +1,11 @@
 # Pure Remote
 
+Two remotes in one ad-free app:
+
+* **Wi-Fi remote** for Android TV / Google TV (below).
+* **IR remote** for *any* TV, using your phone's IR blaster (many Xiaomi/Redmi/Poco/Vivo/iQOO phones): pick the brand, test codes until the TV responds, done. 115 brands, ~370 code sets, works fully offline. Can't find your brand? "Find my TV" tries every power code.
+
+
 Ad-free Android phone remote for **Android TV / Google TV** (Sony, TCL, Mi, OnePlus, Hisense, Chromecast with Google TV, Mi Box and other Android TV boxes).
 
 * No ads, no analytics, no accounts, no Google Play Services – the app only talks to your TV over your home Wi-Fi.
@@ -19,3 +25,6 @@ If the TV isn't found: TV → Settings → System → About → make sure "Andro
 
 ## Build
 `./gradlew assembleRelease` (JDK 17 + Android SDK 35). GitHub Actions builds the APK on every push to `main`.
+
+## Credits
+IR codes: [Flipper-IRDB](https://github.com/Lucaslhm/Flipper-IRDB) (CC0), encoded with Flipper Zero firmware IR encoders (GPL-3.0, used only at build time).
