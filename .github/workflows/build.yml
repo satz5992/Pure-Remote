@@ -35,6 +35,6 @@ jobs:
         with:
           tag_name: v1.1.${{ github.run_number }}
           name: Pure Remote v1.1.${{ github.run_number }}
-          body: Ad-free TV remote: Wi-Fi (Android/Google TV) + IR blaster (any TV). Download PureRemote.apk below and install it on your phone.
+          body: "Ad-free TV remote - Wi-Fi (Android/Google TV) and IR blaster (any TV). Download PureRemote.apk below and install it on your phone."
           files: PureRemote.apk
           make_latest: true
