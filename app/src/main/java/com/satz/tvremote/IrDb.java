@@ -46,7 +46,7 @@ public final class IrDb {
     public static synchronized List<Brand> load(Context c) throws Exception {
         if (brands != null) return brands;
         ByteArrayOutputStream bo = new ByteArrayOutputStream();
-        try (InputStream in = new GZIPInputStream(c.getAssets().open("ir_tv.json.gz"))) {
+        try (InputStream in = new GZIPInputStream(c.getAssets().open("ir_tv.dat"))) {
             byte[] buf = new byte[16384];
             int n;
             while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);

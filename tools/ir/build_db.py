@@ -128,7 +128,7 @@ for b,rs in brands.items():
 out['p']=plist
 js=json.dumps(out,separators=(',',':'))
 os.makedirs(sys.argv[1],exist_ok=True)
-with gzip.open(os.path.join(sys.argv[1],'ir_tv.json.gz'),'wt') as f: f.write(js)
+with gzip.open(os.path.join(sys.argv[1],'ir_tv.dat'),'wt') as f: f.write(js)
 print('brands',len(brands),'remotes',sum(len(r) for r in brands.values()),'patterns',len(plist),'json',len(js),'stats',dict(stats))
 print({b:len(r) for b,r in brands.items() if b in ['Samsung','LG','Sony','Xiaomi','TCL','Panasonic','Philips','Haier','Hisense','Android','Toshiba','Sharp']})
 kc=collections.Counter(k for rs in brands.values() for m,keys in rs for k in keys)

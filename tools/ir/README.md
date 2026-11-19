@@ -1,6 +1,6 @@
 # IR code database
 
-`app/src/main/assets/ir_tv.json.gz` is generated from the TV folder of
+`app/src/main/assets/ir_tv.dat (gzip JSON; not named .gz because the Android build unpacks .gz assets)` is generated from the TV folder of
 [Flipper-IRDB](https://github.com/Lucaslhm/Flipper-IRDB) (CC0). Parsed signals are
 pre-encoded to raw mark/space timings with the Flipper Zero firmware's own IR encoders
 (`lib/infrared/encoder_decoder`, built on the host with the stubs here), so the app only replays timings.
